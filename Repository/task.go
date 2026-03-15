@@ -11,6 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type MongoTaskRepository struct {
+	Collection *mongo.Collection
+}
+
 func getTaskCollection() (*mongo.Collection, error) {
 	if infrastructure.Client == nil {
 		return nil, errors.New("mongodb not initialized")
@@ -61,15 +65,10 @@ func GetTaskByID(taskID primitive.ObjectID, userID primitive.ObjectID) (domain.T
 	return task, nil
 }
 
-func CreateTask(task domain.Task, userID primitive.ObjectID) (domain.Task, bool) {
-
-	collection, err := getTaskCollection()
-	if err != nil {
-		return domain.Task{}, false
-	}
+func (r *MongoTaskRepository) CreateTask(task domain.Task, userID primitive.ObjectID) (domain.Task, bool) {
 
 	task.UserId = userID
-	_, err = collection.InsertOne(context.Background(), task)
+	_, err := r.Collection.InsertOne(context.Background(), task)
 	if err != nil {
 		return domain.Task{}, false
 	}

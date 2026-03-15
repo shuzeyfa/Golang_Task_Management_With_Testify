@@ -32,7 +32,7 @@ func GetTaskByID(taskId primitive.ObjectID, userId primitive.ObjectID) (domain.T
 	return task, nil
 }
 
-func (u *TaskRepository)  CreateTask(task domain.Task, userId primitive.ObjectID) (domain.Task, error) {
+func (u *TaskUsecase) CreateTask(task domain.Task, userId primitive.ObjectID) (domain.Task, error) {
 	createdTask, ok := u.Repo.CreateTask(task, userId)
 	if !ok {
 		return domain.Task{}, errors.New("could not create task")

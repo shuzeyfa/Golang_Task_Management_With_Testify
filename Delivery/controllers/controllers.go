@@ -9,6 +9,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type TaskController struct {
+	Control usecase.TaskUsecase
+}
+
 func RegisterHandler(c *gin.Context) {
 
 	var req domain.RegisterRequest
@@ -105,7 +109,7 @@ func GetTaskByID(c *gin.Context) {
 	c.JSON(http.StatusOK, task)
 }
 
-func CreateTask(c *gin.Context) {
+func (ctr *TaskController) CreateTask(c *gin.Context) {
 	var task domain.Task
 
 	if err := c.ShouldBindJSON(&task); err != nil {
@@ -119,7 +123,7 @@ func CreateTask(c *gin.Context) {
 		return
 	}
 
-	result, err := usecase.CreateTask(task, userID)
+	result, err := ctr.Control.CreateTask(task, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create task"})
 		return
