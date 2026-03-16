@@ -40,8 +40,8 @@ func (u *TaskUsecase) CreateTask(task domain.Task, userId primitive.ObjectID) (d
 }
 
 func (u *TaskUsecase) UpdateTask(task domain.Task, userId primitive.ObjectID) (domain.Task, error) {
-	updatedTask, err := u.Repo.UpdateTask(task, userId)
-	if err != nil {
+	updatedTask, ok := u.Repo.UpdateTask(task, userId)
+	if !ok {
 		return domain.Task{}, errors.New("could not update task")
 	}
 	return updatedTask, nil
