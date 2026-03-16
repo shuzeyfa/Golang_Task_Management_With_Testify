@@ -3,7 +3,6 @@ package usecase
 import (
 	"errors"
 	domain "taskmanagement/Domain"
-	repository "taskmanagement/Repository"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -12,9 +11,9 @@ type TaskUsecase struct {
 	Repo domain.TaskRepository
 }
 
-func GetAllTask(userId primitive.ObjectID) ([]domain.Task, error) {
+func (u *TaskUsecase) GetAllTask(userId primitive.ObjectID) ([]domain.Task, error) {
 
-	tasks, err := repository.GetTasks(userId)
+	tasks, err := u.Repo.GetAllTask(userId)
 	if err != nil {
 		return []domain.Task{}, err
 	}
@@ -22,9 +21,9 @@ func GetAllTask(userId primitive.ObjectID) ([]domain.Task, error) {
 	return tasks, nil
 }
 
-func GetTaskByID(taskId primitive.ObjectID, userId primitive.ObjectID) (domain.Task, error) {
+func (u *TaskUsecase) GetTaskByID(taskId primitive.ObjectID, userId primitive.ObjectID) (domain.Task, error) {
 
-	task, err := repository.GetTaskByID(taskId, userId)
+	task, err := u.Repo.GetTaskByID(taskId, userId)
 	if err != nil {
 		return domain.Task{}, err
 	}
@@ -40,17 +39,17 @@ func (u *TaskUsecase) CreateTask(task domain.Task, userId primitive.ObjectID) (d
 	return createdTask, nil
 }
 
-func UpdateTask(task domain.Task, userId primitive.ObjectID) (domain.Task, error) {
-	updatedTask, ok := repository.UpdateTask(task, userId)
-	if !ok {
+func (u *TaskUsecase) UpdateTask(task domain.Task, userId primitive.ObjectID) (domain.Task, error) {
+	updatedTask, err := u.Repo.UpdateTask(task, userId)
+	if err != nil {
 		return domain.Task{}, errors.New("could not update task")
 	}
 	return updatedTask, nil
 }
 
-func DeleteTask(taskId primitive.ObjectID, userId primitive.ObjectID) error {
-	ok := repository.DeleteTask(taskId, userId)
-	if !ok {
+func (u *TaskUsecase) DeleteTask(taskId primitive.ObjectID, userId primitive.ObjectID) error {
+	err := u.Repo.DeleteTask(taskId, userId)
+	if err != nil {
 		return errors.New("could not delete task")
 	}
 	return nil

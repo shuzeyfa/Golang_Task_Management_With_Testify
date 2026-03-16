@@ -24,7 +24,7 @@ func Router() *gin.Engine {
 	}
 
 	taskController := &controllers.TaskController{
-		Control: *taskUsecase,
+		Control: taskUsecase,
 	}
 
 	r := gin.Default()
@@ -32,11 +32,11 @@ func Router() *gin.Engine {
 	r.POST("/register", controllers.RegisterHandler)
 	r.POST("/login", controllers.LoginUser)
 
-	r.GET("/tasks", infrastructure.AuthMiddleware(), controllers.GetAllTask)
-	r.GET("/task/:id", infrastructure.AuthMiddleware(), controllers.GetTaskByID)
+	r.GET("/tasks", infrastructure.AuthMiddleware(), taskController.GetAllTask)
+	r.GET("/task/:id", infrastructure.AuthMiddleware(), taskController.GetTaskByID)
 	r.POST("/create", infrastructure.AuthMiddleware(), taskController.CreateTask)
-	r.PUT("/update/:id", infrastructure.AuthMiddleware(), controllers.UpdateTask)
-	r.DELETE("/delete/:id", infrastructure.AuthMiddleware(), controllers.DeleteTask)
+	r.PUT("/update/:id", infrastructure.AuthMiddleware(), taskController.UpdateTask)
+	r.DELETE("/delete/:id", infrastructure.AuthMiddleware(), taskController.DeleteTask)
 
 	return r
 }

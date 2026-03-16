@@ -39,5 +39,9 @@ type LoginRequest struct {
 }
 
 type TaskRepository interface {
+	GetAllTask(userId primitive.ObjectID) ([]Task, error)
+	GetTaskByID(taskId primitive.ObjectID, userId primitive.ObjectID) (Task, error)
 	CreateTask(task Task, user_id primitive.ObjectID) (Task, bool)
+	UpdateTask(task Task, userId primitive.ObjectID) (Task, bool)
+	DeleteTask(taskId primitive.ObjectID, userId primitive.ObjectID) error
 }

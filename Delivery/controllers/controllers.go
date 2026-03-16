@@ -10,7 +10,7 @@ import (
 )
 
 type TaskController struct {
-	Control usecase.TaskUsecase
+	Control *usecase.TaskUsecase
 }
 
 func RegisterHandler(c *gin.Context) {
@@ -75,7 +75,7 @@ func GetTaskIdFromContext(c *gin.Context) (primitive.ObjectID, bool) {
 	return userID, true
 }
 
-func GetAllTask(c *gin.Context) {
+func (ctr *TaskController) GetAllTask(c *gin.Context) {
 
 	userId, ok := getUserIDFromContext(c)
 	if !ok {
@@ -83,7 +83,7 @@ func GetAllTask(c *gin.Context) {
 		return
 	}
 
-	tasks, err := usecase.GetAllTask(userId)
+	tasks, err := ctr.Control.GetAllTask(userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -92,7 +92,7 @@ func GetAllTask(c *gin.Context) {
 	c.JSON(http.StatusOK, tasks)
 }
 
-func GetTaskByID(c *gin.Context) {
+func (ctr *TaskController) GetTaskByID(c *gin.Context) {
 	TaskId, ok1 := GetTaskIdFromContext(c)
 	userId, ok2 := getUserIDFromContext(c)
 	if !ok1 || !ok2 {
@@ -100,7 +100,7 @@ func GetTaskByID(c *gin.Context) {
 		return
 	}
 
-	task, err := usecase.GetTaskByID(TaskId, userId)
+	task, err := ctr.Control.GetTaskByID(TaskId, userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not fetch task"})
 		return
@@ -133,7 +133,7 @@ func (ctr *TaskController) CreateTask(c *gin.Context) {
 
 }
 
-func UpdateTask(c *gin.Context) {
+func (ctr *TaskController) UpdateTask(c *gin.Context) {
 	var task domain.Task
 
 	if err := c.ShouldBindJSON(&task); err != nil {
@@ -147,7 +147,7 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	result, err := usecase.UpdateTask(task, userID)
+	result, err := ctr.Control.UpdateTask(task, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not update task"})
 		return
@@ -156,7 +156,7 @@ func UpdateTask(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-func DeleteTask(c *gin.Context) {
+func (ctr *TaskController) DeleteTask(c *gin.Context) {
 	TaskId, ok1 := GetTaskIdFromContext(c)
 	userId, ok2 := getUserIDFromContext(c)
 	if !ok1 || !ok2 {
@@ -164,7 +164,7 @@ func DeleteTask(c *gin.Context) {
 		return
 	}
 
-	err := usecase.DeleteTask(TaskId, userId)
+	err := ctr.Control.DeleteTask(TaskId, userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not delete task"})
 		return
