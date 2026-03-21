@@ -45,3 +45,8 @@ type TaskRepository interface {
 	UpdateTask(task Task, userId primitive.ObjectID) (Task, bool)
 	DeleteTask(taskId primitive.ObjectID, userId primitive.ObjectID) error
 }
+
+type UserRepository interface {
+	CreateUser(user User) error
+	GetUserByEmail(email string) (User, error)
+}

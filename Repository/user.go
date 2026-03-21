@@ -2,31 +2,21 @@ package repository
 
 import (
 	"context"
-	"errors"
 	domain "taskmanagement/Domain"
-	infrastructure "taskmanagement/Infrastructure"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func getUserCollection() (*mongo.Collection, error) {
-	if infrastructure.Client == nil {
-		return nil, errors.New("mongodb not initialized")
-	}
-	return infrastructure.Client.Database(infrastructure.DBName).Collection("user"), nil
+type MongoUserRepository struct {
+	Collection *mongo.Collection
 }
 
-func GetUserByEmail(email string) (domain.User, error) {
-
-	collection, err := getUserCollection()
-	if err != nil {
-		return domain.User{}, err
-	}
+func (r *MongoUserRepository) GetUserByEmail(email string) (domain.User, error) {
 
 	var user domain.User
 
-	err = collection.FindOne(context.Background(), bson.M{"email": email}).Decode(&user)
+	err := r.Collection.FindOne(context.Background(), bson.M{"email": email}).Decode(&user)
 	if err != nil {
 		return domain.User{}, err
 	}
@@ -35,13 +25,9 @@ func GetUserByEmail(email string) (domain.User, error) {
 
 }
 
-func CreateUser(user domain.User) error {
-	collection, err := getUserCollection()
-	if err != nil {
-		return err
-	}
+func (r *MongoUserRepository) CreateUser(user domain.User) error {
 
-	_, err = collection.InsertOne(context.Background(), user)
+	_, err := r.Collection.InsertOne(context.Background(), user)
 	if err != nil {
 		return err
 	}

@@ -14,7 +14,7 @@ func Router() *gin.Engine {
 	infrastructure.ConnectDB()
 	log.Println("App is ready!")
 
-	//initialize repository, usecase and controller
+	//initialize repository, usecase and controller for task
 	taskRepo := &repository.MongoTaskRepository{
 		Collection: infrastructure.Client.Database(infrastructure.DBName).Collection("task"),
 	}
@@ -27,10 +27,22 @@ func Router() *gin.Engine {
 		Control: taskUsecase,
 	}
 
+	userRepo := &repository.MongoUserRepository{
+		Collection: infrastructure.Client.Database(infrastructure.DBName).Collection("user"),
+	}
+
+	UserUsecase := &usecase.UserUsecase{
+		Repo: userRepo,
+	}
+
+	UserController := &controllers.UserController{
+		Control: UserUsecase,
+	}
+
 	r := gin.Default()
 
-	r.POST("/register", controllers.RegisterHandler)
-	r.POST("/login", controllers.LoginUser)
+	r.POST("/register", UserController.RegisterHandler)
+	r.POST("/login", UserController.LoginUser)
 
 	r.GET("/tasks", infrastructure.AuthMiddleware(), taskController.GetAllTask)
 	r.GET("/task/:id", infrastructure.AuthMiddleware(), taskController.GetTaskByID)

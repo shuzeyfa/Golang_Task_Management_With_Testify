@@ -13,7 +13,11 @@ type TaskController struct {
 	Control *usecase.TaskUsecase
 }
 
-func RegisterHandler(c *gin.Context) {
+type UserController struct {
+	Control *usecase.UserUsecase
+}
+
+func (ctr *UserController) RegisterHandler(c *gin.Context) {
 
 	var req domain.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -21,7 +25,7 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	user, err := usecase.RegisterUser(req)
+	user, err := ctr.Control.RegisterUser(req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -29,14 +33,14 @@ func RegisterHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func LoginUser(c *gin.Context) {
+func (ctr *UserController) LoginUser(c *gin.Context) {
 	var req domain.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	tokenString, err := usecase.LoginUser(req)
+	tokenString, err := ctr.Control.LoginUser(req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
